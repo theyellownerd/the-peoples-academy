@@ -1,8 +1,8 @@
 const APP = document.getElementById("app");
 const CFG = {
   // YOU WILL PASTE THESE IN STEP 5
-  SUPABASE_URL: "PASTE_SUPABASE_URL_HERE",
-  SUPABASE_ANON: "PASTE_SUPABASE_ANON_KEY_HERE",
+  SUPABASE_URL: "https://qqazafynfnwchygoqfoe.supabase.co",
+  SUPABASE_ANON: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxYXphZnluZm53Y2h5Z29xZm9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2NDIwMzksImV4cCI6MjA4MzIxODAzOX0.OCGrE3NmPBDNZFsT1o1fbZMkvYcI-tf84LNGWqBfGI4",
 
   ADMIN_EMAIL: "brandonesmart@gmail.com",
   TAB_FAIL_THRESHOLD: 4,
