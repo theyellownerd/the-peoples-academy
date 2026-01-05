@@ -1,7 +1,7 @@
 const APP = document.getElementById("app");
 const CFG = {
   // YOU WILL PASTE THESE IN STEP 5
-  SUPABASE_URL: "https://qqazafynfnwchygoqfoe.supabase.co",
+  SUPABASE_URL: "https://qqazafynfnwchygoqfoe.supabaseClient.co",
   SUPABASE_ANON: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxYXphZnluZm53Y2h5Z29xZm9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2NDIwMzksImV4cCI6MjA4MzIxODAzOX0.OCGrE3NmPBDNZFsT1o1fbZMkvYcI-tf84LNGWqBfGI4",
 
   ADMIN_EMAIL: "brandonesmart@gmail.com",
@@ -11,7 +11,10 @@ const CFG = {
 };
 
 const { tracks, questions } = window.PEOPLES_ACADEMY;
-const supabase = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON);
+const supabaseClient = window.supabaseClient.createClient(
+  CFG.SUPABASE_URL,
+  CFG.SUPABASE_ANON
+);
 
 function html(strings, ...vals){
   return strings.map((s,i)=> s + (vals[i] ?? "")).join("");
@@ -33,7 +36,7 @@ function pickQuestions({track, moduleId, count, exam=false}){
 }
 
 async function getUser(){
-  const { data } = await supabase.auth.getUser();
+  const { data } = await supabaseClient.auth.getUser();
   return data.user;
 }
 
@@ -47,7 +50,7 @@ async function requireUser(){
 }
 
 async function getProfile(user){
-  const { data, error } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+  const { data, error } = await supabaseClient.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -70,7 +73,7 @@ function renderLogin(msg=""){
     const email = document.getElementById("email").value.trim();
     if (!email) return renderLogin("Enter an email.");
     const redirectTo = window.location.href;
-    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
+    const { error } = await supabaseClient.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
     if (error) return renderLogin(error.message);
     renderLogin("Link sent. Check your email.");
   };
@@ -96,7 +99,7 @@ async function renderProfile(user){
     const last = document.getElementById("last").value.trim();
     if (!first || !last) return alert("First and last name required.");
     const payload = { user_id: user.id, first_name: first, last_name: last, email: user.email };
-    const { error } = await supabase.from("profiles").upsert(payload);
+    const { error } = await supabaseClient.from("profiles").upsert(payload);
     if (error) return alert(error.message);
     renderHome();
   };
@@ -130,7 +133,7 @@ async function renderHome(){
   `;
 
   document.getElementById("logout").onclick = async () => {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     renderLogin();
   };
 }
@@ -229,7 +232,7 @@ window.__kc = async function(trackKey, moduleId){
     const score = Math.round((correct/qs.length)*100);
     const passed = score === 100;
 
-    await supabase.from("attempts").insert({
+    await supabaseClient.from("attempts").insert({
       user_id: user.id,
       track: trackKey,
       assessment_type: "kc",
@@ -327,7 +330,7 @@ window.__exam = async function(trackKey){
 
     document.removeEventListener("visibilitychange", onVis);
 
-    await supabase.from("attempts").insert({
+    await supabaseClient.from("attempts").insert({
       user_id: user.id,
       track: trackKey,
       assessment_type: "exam",
@@ -350,7 +353,7 @@ window.__exam = async function(trackKey){
     }
 
     // issue certificate row
-    await supabase.from("certificates").insert({ user_id: user.id, track: trackKey });
+    await supabaseClient.from("certificates").insert({ user_id: user.id, track: trackKey });
 
     // generate and download PDF
     await downloadCertificate(trackKey);
@@ -400,7 +403,7 @@ async function downloadCertificate(trackKey){
 
 async function boot(){
   // handle login callback (Supabase sets session automatically)
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return renderLogin();
 
   const user = await getUser();
